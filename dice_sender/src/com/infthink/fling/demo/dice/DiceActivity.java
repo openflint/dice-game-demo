@@ -41,7 +41,7 @@ public class DiceActivity extends ActionBarActivity implements
     private static final int MSG_STOP = 1;
 
     private static final String APP_ID = Fling.FlingApi
-            .makeApplicationId("http://castapp.infthink.com/receiver/dice/index.html");
+            .makeApplicationId("http://fling.matchstick.tv/receiver/dice/index.html");
 
     private FlingDiceManager mFlingGameManager;
 
