@@ -39,26 +39,15 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
         return GAME_NAMESPACE;
     }
 
-    public final void start(FlingManager apiClient) {
-        try {
-            Log.d(TAG, "start");
-            JSONObject payload = new JSONObject();
-            payload.put("command", "start");
-            sendMessage(apiClient, payload.toString());
-        } catch (JSONException e) {
-            Log.e(TAG, "Cannot create object to join a game", e);
-        }
-    }
-
-    public final void stop(FlingManager apiClient) {
-        Log.d(TAG, "stop");
-        try {
-            JSONObject payload = new JSONObject();
-            payload.put("command", "stop");
-            sendMessage(apiClient, payload.toString());
-        } catch (JSONException e) {
-            Log.e(TAG, "Cannot create object to send a move", e);
-        }
+    /**
+     * The sender can use that to send String messages to the receiver over that channel
+     * @param apiClient
+     * @param message
+     */
+    private final void sendMessage(FlingManager apiClient, String message) {
+        Log.d(TAG, "Sending message: (ns=" + GAME_NAMESPACE + ") " + message);
+        Fling.FlingApi.sendMessage(apiClient, GAME_NAMESPACE, message)
+                .setResultCallback(new SendMessageResultCallback(message));
     }
 
     @Override
@@ -72,12 +61,6 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    private final void sendMessage(FlingManager apiClient, String message) {
-        Log.d(TAG, "Sending message: (ns=" + GAME_NAMESPACE + ") " + message);
-        Fling.FlingApi.sendMessage(apiClient, GAME_NAMESPACE, message)
-                .setResultCallback(new SendMessageResultCallback(message));
     }
 
     private final class SendMessageResultCallback implements
@@ -99,4 +82,27 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
         }
     }
 
+
+    public final void start(FlingManager apiClient) {
+        try {
+            Log.d(TAG, "start");
+            JSONObject payload = new JSONObject();
+            payload.put("command", "start");
+            sendMessage(apiClient, payload.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "Cannot create object to join a game", e);
+        }
+    }
+
+    public final void stop(FlingManager apiClient) {
+        Log.d(TAG, "stop");
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("command", "stop");
+            sendMessage(apiClient, payload.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "Cannot create object to send a move", e);
+        }
+    }
+    
 }

@@ -8,15 +8,11 @@ import tv.matchstick.fling.Fling;
 import tv.matchstick.fling.FlingDevice;
 import tv.matchstick.fling.FlingManager;
 import tv.matchstick.fling.FlingMediaControlIntent;
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.RemoteMediaPlayer;
 import tv.matchstick.fling.ResultCallback;
 import tv.matchstick.fling.Status;
 import tv.matchstick.fling.Fling.ApplicationConnectionResult;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.media.MediaRouteSelector;
@@ -30,7 +26,6 @@ public class FlingDiceManager {
     private static final String TAG = FlingDiceManager.class.getSimpleName();
 
     private Context mContext;
-    private Handler mHandler;
     private String mApplicationId;
 
     private MediaRouter mMediaRouter;
@@ -46,7 +41,6 @@ public class FlingDiceManager {
 
     public FlingDiceManager(Context context, String applicationId) {
         mContext = context;
-        mHandler = new Handler(Looper.getMainLooper());
         mApplicationId = applicationId;
 
         Log.d(TAG, "Application ID is: " + mApplicationId);
@@ -66,13 +60,19 @@ public class FlingDiceManager {
 
         mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
-
     }
 
     private String getAppId() {
         return mApplicationId;
     }
 
+    /**
+     * Create mediarouter button
+     * 
+     * @param menu
+     * @param menuResourceId
+     * @return
+     */
     public MenuItem addMediaRouterButton(Menu menu, int menuResourceId) {
         MenuItem mediaRouteMenuItem = menu.findItem(menuResourceId);
         MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider) MenuItemCompat
@@ -86,15 +86,22 @@ public class FlingDiceManager {
         mMediaRouter.removeCallback(mMediaRouterCallback);
     }
 
-    public void startShake() {
-        if (mApiClient != null && mApiClient.isConnected()) {
-            mGameChannel.start(mApiClient);
+    /**
+     * An extension of the MediaRoute.Callback specifically for the Dice
+     * game.
+     */
+    private class MediaRouterCallback extends MediaRouter.Callback {
+        @Override
+        public void onRouteSelected(MediaRouter router, RouteInfo route) {
+            Log.d(TAG, "onRouteSelected: " + route);
+            FlingDevice device = FlingDevice.getFromBundle(route.getExtras());
+            setSelectedDevice(device);
         }
-    }
 
-    public void stopShake() {
-        if (mApiClient != null && mApiClient.isConnected()) {
-            mGameChannel.stop(mApiClient);
+        @Override
+        public void onRouteUnselected(MediaRouter router, RouteInfo route) {
+            Log.d(TAG, "onRouteUnselected: " + route);
+            setSelectedDevice(null);
         }
     }
 
@@ -120,6 +127,11 @@ public class FlingDiceManager {
         }
     }
 
+    /**
+     * Connect select device
+     * 
+     * @param device
+     */
     private void connectApiClient() {
         Fling.FlingOptions apiOptions = Fling.FlingOptions.builder(
                 mSelectedDevice, mFlingListener).build();
@@ -131,29 +143,15 @@ public class FlingDiceManager {
         mApiClient.connect();
     }
 
+    /**
+     * Disconnect device
+     * 
+     * @param device
+     */
     private void disconnectApiClient() {
         if (mApiClient != null) {
             mApiClient.disconnect();
             mApiClient = null;
-        }
-    }
-
-    /**
-     * An extension of the MediaRoute.Callback specifically for the TicTacToe
-     * game.
-     */
-    private class MediaRouterCallback extends MediaRouter.Callback {
-        @Override
-        public void onRouteSelected(MediaRouter router, RouteInfo route) {
-            Log.d(TAG, "onRouteSelected: " + route);
-            FlingDevice device = FlingDevice.getFromBundle(route.getExtras());
-            setSelectedDevice(device);
-        }
-
-        @Override
-        public void onRouteUnselected(MediaRouter router, RouteInfo route) {
-            Log.d(TAG, "onRouteUnselected: " + route);
-            setSelectedDevice(null);
         }
     }
 
@@ -171,6 +169,14 @@ public class FlingDiceManager {
         }
     }
 
+    /**
+     * FlingManager.ConnectionCallbacks and
+     * FlingManager.OnConnectionFailedListener callbacks to be informed of the
+     * connection status. All of the callbacks run on the main UI thread.
+     * 
+     * @author changxing
+     * 
+     */
     private class ConnectionCallbacks implements
             FlingManager.ConnectionCallbacks {
         @Override
@@ -215,6 +221,18 @@ public class FlingDiceManager {
                         "ConnectionResultCallback. Unable to launch the game. statusCode: "
                                 + status.getStatusCode());
             }
+        }
+    }
+
+    public void startShake() {
+        if (mApiClient != null && mApiClient.isConnected()) {
+            mGameChannel.start(mApiClient);
+        }
+    }
+
+    public void stopShake() {
+        if (mApiClient != null && mApiClient.isConnected()) {
+            mGameChannel.stop(mApiClient);
         }
     }
 
