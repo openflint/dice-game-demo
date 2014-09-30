@@ -16,6 +16,6 @@
 -->
 
 <resources>
-    <string name="app_name">Game</string>
+    <string name="app_name">Dice Demo</string>
     <string name="media_route_menu_title">Play on&#8230;</string>
 </resources>
