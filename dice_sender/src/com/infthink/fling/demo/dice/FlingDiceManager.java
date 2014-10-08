@@ -27,6 +27,7 @@ public class FlingDiceManager {
 
     private Context mContext;
     private String mApplicationId;
+    private String mSessionId;
 
     private MediaRouter mMediaRouter;
     private MediaRouteSelector mMediaRouteSelector;
@@ -116,6 +117,7 @@ public class FlingDiceManager {
                 Log.w(TAG, "Exception while connecting API client", e);
                 disconnectApiClient();
             }
+            mSessionId = null;
         } else {
             if (mApiClient != null) {
                 if (mApiClient.isConnected()) {
@@ -160,12 +162,21 @@ public class FlingDiceManager {
         public void onApplicationDisconnected(int statusCode) {
             Log.d(TAG, "Fling.Listener.onApplicationDisconnected: "
                     + statusCode);
-            try {
-                Fling.FlingApi.removeMessageReceivedCallbacks(mApiClient,
-                        mGameChannel.getNamespace());
-            } catch (IOException e) {
-                Log.w(TAG, "Exception while launching application", e);
+            if (mApiClient != null) {
+                if (mApiClient.isConnected() || mApiClient.isConnecting()) {
+                    try {
+                        Fling.FlingApi.stopApplication(mApiClient, mSessionId);
+                        Fling.FlingApi.removeMessageReceivedCallbacks(
+                                mApiClient, mGameChannel.getNamespace());
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception while removing channel", e);
+                    }
+                    mApiClient.disconnect();
+                }
+                mApiClient = null;
             }
+            mSelectedDevice = null;
+            mMediaRouter.selectRoute(mMediaRouter.getDefaultRoute());
         }
     }
 
@@ -213,6 +224,7 @@ public class FlingDiceManager {
                 try {
                     Fling.FlingApi.setMessageReceivedCallbacks(mApiClient,
                             mGameChannel.getNamespace(), mGameChannel);
+                    mSessionId = result.getSessionId();
                 } catch (IOException e) {
                     Log.w(TAG, "Exception while launching application", e);
                 }
