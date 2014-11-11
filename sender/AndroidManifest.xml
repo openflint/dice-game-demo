@@ -51,16 +51,18 @@
             </intent-filter>
         </activity>
 
-         <service android:name="com.infthink.fling.demo.dice.AppCastDeviceService" android:exported="false">
+        <service
+            android:name="tv.matchstick.fling.service.FlingDeviceService"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.media.MediaRouteProviderService" />
             </intent-filter>
         </service>
-
-        <service android:name="com.infthink.fling.demo.dice.AppCastService" android:exported="false">
+        <service
+            android:name="tv.matchstick.fling.service.FlingService"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="tv.matchstick.fling.service.FLING" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
 

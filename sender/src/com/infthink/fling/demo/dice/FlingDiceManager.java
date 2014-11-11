@@ -26,8 +26,7 @@ public class FlingDiceManager {
     private static final String TAG = FlingDiceManager.class.getSimpleName();
 
     private Context mContext;
-    private String mApplicationId;
-    private String mSessionId;
+    private String mApplicationUrl;
 
     private MediaRouter mMediaRouter;
     private MediaRouteSelector mMediaRouteSelector;
@@ -40,19 +39,22 @@ public class FlingDiceManager {
 
     private DiceChannel mGameChannel;
 
-    public FlingDiceManager(Context context, String applicationId) {
+    public FlingDiceManager(Context context, String url) {
         mContext = context;
-        mApplicationId = applicationId;
+        mApplicationUrl = url;
 
-        Log.d(TAG, "Application ID is: " + mApplicationId);
+        Log.d(TAG, "Application URL is: " + mApplicationUrl);
 
+        String APPLICATION_ID = "~dice";
+        Fling.FlingApi.setApplicationId(APPLICATION_ID);
+        
         mGameChannel = new DiceChannel();
 
         mMediaRouter = MediaRouter.getInstance(mContext);
         mMediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(
                         FlingMediaControlIntent
-                                .categoryForFling(mApplicationId)).build();
+                                .categoryForFling(APPLICATION_ID)).build();
 
         mMediaRouterCallback = new MediaRouterCallback();
         mFlingListener = new FlingListener();
@@ -63,8 +65,8 @@ public class FlingDiceManager {
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
     }
 
-    private String getAppId() {
-        return mApplicationId;
+    private String getAppUrl() {
+        return mApplicationUrl;
     }
 
     /**
@@ -117,7 +119,6 @@ public class FlingDiceManager {
                 Log.w(TAG, "Exception while connecting API client", e);
                 disconnectApiClient();
             }
-            mSessionId = null;
         } else {
             if (mApiClient != null) {
                 if (mApiClient.isConnected()) {
@@ -165,7 +166,7 @@ public class FlingDiceManager {
             if (mApiClient != null) {
                 if (mApiClient.isConnected() || mApiClient.isConnecting()) {
                     try {
-                        Fling.FlingApi.stopApplication(mApiClient, mSessionId);
+                        Fling.FlingApi.stopApplication(mApiClient);
                         Fling.FlingApi.removeMessageReceivedCallbacks(
                                 mApiClient, mGameChannel.getNamespace());
                     } catch (IOException e) {
@@ -198,7 +199,7 @@ public class FlingDiceManager {
         @Override
         public void onConnected(Bundle connectionHint) {
             Log.d(TAG, "ConnectionCallbacks.onConnected");
-            Fling.FlingApi.launchApplication(mApiClient, getAppId())
+            Fling.FlingApi.launchApplication(mApiClient, getAppUrl())
                     .setResultCallback(new ConnectionResultCallback());
         }
     }
@@ -220,11 +221,10 @@ public class FlingDiceManager {
             ApplicationMetadata appMetaData = result.getApplicationMetadata();
 
             if (status.isSuccess()) {
-                Log.d(TAG, "ConnectionResultCallback: " + appMetaData.getName());
+                Log.d(TAG, "ConnectionResultCallback: " + appMetaData.getData());
                 try {
                     Fling.FlingApi.setMessageReceivedCallbacks(mApiClient,
                             mGameChannel.getNamespace(), mGameChannel);
-                    mSessionId = result.getSessionId();
                 } catch (IOException e) {
                     Log.w(TAG, "Exception while launching application", e);
                 }

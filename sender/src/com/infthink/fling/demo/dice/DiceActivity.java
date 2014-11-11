@@ -40,8 +40,7 @@ public class DiceActivity extends ActionBarActivity implements
     private static final int MSG_START = 0;
     private static final int MSG_STOP = 1;
 
-    private static final String APP_ID = Fling.FlingApi
-            .makeApplicationId("http://fling.matchstick.tv/receiver/dice/index.html");
+    private static final String APP_URL = "http://openflint.github.io/dice-game-demo/receiver/index.html";
 
     private FlingDiceManager mFlingGameManager;
 
@@ -75,7 +74,7 @@ public class DiceActivity extends ActionBarActivity implements
                     .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
-        mFlingGameManager = new FlingDiceManager(this, APP_ID);
+        mFlingGameManager = new FlingDiceManager(this, APP_URL);
     }
 
     /**
