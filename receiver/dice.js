@@ -133,40 +133,24 @@ Aui.ready(function () {
     /*********** fling app *************/
     var init_fling = function () {
         var self = this;
-        this.receiverDaemon = new ReceiverDaemon("~dice");
-        var channel = this.receiverDaemon.createMessageChannel("ws");
-        this.receiverDaemon.open();
+        self.receiverWrapper = new ReceiverManagerWrapper("~dice");
+        var messageBus = self.receiverWrapper.createMessageBus("urn:x-cast:com.infthink.fling.dice");
 
-        channel.on("message", function(senderId, messageType, message) {
-            console.info("channel message ", senderId, messageType, message);
-            switch (messageType) {
-                case "senderConnected":
-                case "senderDisconnected":
-                    break;
-                case "message":
-                    var messageData = JSON.parse(message.data);
-                    var namespace = messageData.namespace;
-                    console.info("namespace:", namespace);
-                    if (namespace == "urn:x-cast:com.infthink.fling.dice") {
-                        var data = JSON.parse(messageData.data);
-                        console.log('********onMessage********' + JSON.stringify(data));
-                        if (data.command === 'start') {
-                            console.log(' message command: ' + data.command);
-                            self.speedY = speedY + Math.random()* 10 + 100;
-                            self.speedX = speedX + Math.random()* 10 + 100;
-                            startMove(oContainer);
-                        } else if (data.command === 'stop') {
-                            console.log(' message command: ' + data.command);
-                        } else {
-                            console.log('Invalid message command: ' + data.command);
-
-                        }
-                    } else {
-                        console.info("3 namespace:", namespace);
-                    }
-                    break;
+        messageBus.on("message", function (senderId, data) {
+            console.log('********onMessage********' + data);
+            var message = JSON.parse(data);
+            console.log(' message command: ' + message.command);
+            if (message.command === 'start') {
+                self.speedY = speedY + Math.random() * 10 + 100;
+                self.speedX = speedX + Math.random() * 10 + 100;
+                startMove(oContainer);
+            } else if (message.command === 'stop') {
+            } else {
+                console.log('Invalid message command: ' + message.command);
             }
         });
+
+        self.receiverWrapper.open();
     };
 
     init_fling();
