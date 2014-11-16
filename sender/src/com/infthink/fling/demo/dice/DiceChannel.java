@@ -30,7 +30,7 @@ import android.util.Log;
 public class DiceChannel implements Fling.MessageReceivedCallback {
     private static final String TAG = DiceChannel.class.getSimpleName();
 
-    private static final String GAME_NAMESPACE = "urn:x-cast:com.infthink.fling.dice";
+    private static final String GAME_NAMESPACE = "urn:flint:org.openflint.fling.dice";
 
     public DiceChannel() {
     }

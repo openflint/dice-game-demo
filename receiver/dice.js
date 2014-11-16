@@ -134,7 +134,7 @@ Aui.ready(function () {
     var init_fling = function () {
         var self = this;
         self.receiverWrapper = new ReceiverManagerWrapper("~dice");
-        var messageBus = self.receiverWrapper.createMessageBus("urn:x-cast:com.infthink.fling.dice");
+        var messageBus = self.receiverWrapper.createMessageBus("urn:flint:org.openflint.fling.dice");
 
         messageBus.on("message", function (senderId, data) {
             console.log('********onMessage********' + data);
