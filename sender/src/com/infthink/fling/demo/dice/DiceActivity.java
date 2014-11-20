@@ -34,7 +34,7 @@ import android.view.Menu;
 public class DiceActivity extends ActionBarActivity implements
         SensorEventListener {
 
-    private static final int SPEED_SHRESHOLD = 3000;
+    private static final int SPEED_THRESHOLD = 3000;
     private static final int UPTATE_INTERVAL_TIME = 100;
 
     private static final int MSG_START = 0;
@@ -164,7 +164,7 @@ public class DiceActivity extends ActionBarActivity implements
         double speed = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ
                 * deltaZ)
                 / timeInterval * 10000;
-        if (speed >= SPEED_SHRESHOLD) {
+        if (speed >= SPEED_THRESHOLD) {
             if (!mIsStart) {
                 mIsStart = true;
                 mHandler.sendEmptyMessage(MSG_START);
