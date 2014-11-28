@@ -1,6 +1,6 @@
 
 * { margin:0; padding:0; }
-html { background:#000000; background-image: url("image/logo.png"); background-size: cover}
+html { background:#000000; background-image: url("image/logo.png"); background-size: 20%;background-repeat: no-repeat; background-position: left 10px top 10px;}
 body { background:#efefef; overflow:hidden; }
 
 h1 { 
