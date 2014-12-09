@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.infthink.fling.demo.dice;
+package com.infthink.flint.demo.dice;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tv.matchstick.fling.Fling;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.FlingManager;
-import tv.matchstick.fling.ResultCallback;
-import tv.matchstick.fling.Status;
+import tv.matchstick.flint.Flint;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.FlintManager;
+import tv.matchstick.flint.ResultCallback;
+import tv.matchstick.flint.Status;
 
 import android.util.Log;
 
-public class DiceChannel implements Fling.MessageReceivedCallback {
+public class DiceChannel implements Flint.MessageReceivedCallback {
     private static final String TAG = DiceChannel.class.getSimpleName();
 
     private static final String GAME_NAMESPACE = "urn:flint:org.openflint.fling.dice";
@@ -44,14 +44,14 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
      * @param apiClient
      * @param message
      */
-    private final void sendMessage(FlingManager apiClient, String message) {
+    private final void sendMessage(FlintManager apiClient, String message) {
         Log.d(TAG, "Sending message: (ns=" + GAME_NAMESPACE + ") " + message);
-        Fling.FlingApi.sendMessage(apiClient, GAME_NAMESPACE, message)
+        Flint.FlintApi.sendMessage(apiClient, GAME_NAMESPACE, message)
                 .setResultCallback(new SendMessageResultCallback(message));
     }
 
     @Override
-    public void onMessageReceived(FlingDevice flingDevice, String namespace,
+    public void onMessageReceived(FlintDevice flingDevice, String namespace,
             String message) {
         Log.d(TAG, "onTextMessageReceived: " + message);
         JSONObject payload;
@@ -83,7 +83,7 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
     }
 
 
-    public final void start(FlingManager apiClient) {
+    public final void start(FlintManager apiClient) {
         try {
             Log.d(TAG, "start");
             JSONObject payload = new JSONObject();
@@ -94,7 +94,7 @@ public class DiceChannel implements Fling.MessageReceivedCallback {
         }
     }
 
-    public final void stop(FlingManager apiClient) {
+    public final void stop(FlintManager apiClient) {
         Log.d(TAG, "stop");
         try {
             JSONObject payload = new JSONObject();

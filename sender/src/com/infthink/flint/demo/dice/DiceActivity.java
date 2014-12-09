@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.infthink.fling.demo.dice;
+package com.infthink.flint.demo.dice;
 
-import tv.matchstick.fling.Fling;
+import com.infthink.flint.demo.dice.R;
+
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;

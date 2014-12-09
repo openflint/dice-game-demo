@@ -1,16 +1,16 @@
-package com.infthink.fling.demo.dice;
+package com.infthink.flint.demo.dice;
 
 import java.io.IOException;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.ConnectionResult;
-import tv.matchstick.fling.Fling;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.FlingManager;
-import tv.matchstick.fling.FlingMediaControlIntent;
-import tv.matchstick.fling.ResultCallback;
-import tv.matchstick.fling.Status;
-import tv.matchstick.fling.Fling.ApplicationConnectionResult;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.ConnectionResult;
+import tv.matchstick.flint.Flint;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.FlintManager;
+import tv.matchstick.flint.FlintMediaControlIntent;
+import tv.matchstick.flint.ResultCallback;
+import tv.matchstick.flint.Status;
+import tv.matchstick.flint.Flint.ApplicationConnectionResult;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -31,11 +31,10 @@ public class FlingDiceManager {
     private MediaRouter mMediaRouter;
     private MediaRouteSelector mMediaRouteSelector;
     private MediaRouterCallback mMediaRouterCallback;
-    private FlingDevice mSelectedDevice;
-    private FlingManager mApiClient;
-    private FlingListener mFlingListener;
+    private FlintDevice mSelectedDevice;
+    private FlintManager mApiClient;
+    private FlintListener mFlingListener;
     private ConnectionCallbacks mConnectionCallbacks;
-    private ConnectionFailedListener mConnectionFailedListener;
 
     private DiceChannel mGameChannel;
 
@@ -46,20 +45,19 @@ public class FlingDiceManager {
         Log.d(TAG, "Application URL is: " + mApplicationUrl);
 
         String APPLICATION_ID = "~dice";
-        Fling.FlingApi.setApplicationId(APPLICATION_ID);
+        Flint.FlintApi.setApplicationId(APPLICATION_ID);
         
         mGameChannel = new DiceChannel();
 
         mMediaRouter = MediaRouter.getInstance(mContext);
         mMediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(
-                        FlingMediaControlIntent
-                                .categoryForFling(APPLICATION_ID)).build();
+                        FlintMediaControlIntent
+                                .categoryForFlint(APPLICATION_ID)).build();
 
         mMediaRouterCallback = new MediaRouterCallback();
-        mFlingListener = new FlingListener();
+        mFlingListener = new FlintListener();
         mConnectionCallbacks = new ConnectionCallbacks();
-        mConnectionFailedListener = new ConnectionFailedListener();
 
         mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
@@ -97,7 +95,7 @@ public class FlingDiceManager {
         @Override
         public void onRouteSelected(MediaRouter router, RouteInfo route) {
             Log.d(TAG, "onRouteSelected: " + route);
-            FlingDevice device = FlingDevice.getFromBundle(route.getExtras());
+            FlintDevice device = FlintDevice.getFromBundle(route.getExtras());
             setSelectedDevice(device);
         }
 
@@ -108,7 +106,7 @@ public class FlingDiceManager {
         }
     }
 
-    private void setSelectedDevice(FlingDevice device) {
+    private void setSelectedDevice(FlintDevice device) {
         Log.d(TAG, "setSelectedDevice: " + device);
         mSelectedDevice = device;
         if (mSelectedDevice != null) {
@@ -122,7 +120,7 @@ public class FlingDiceManager {
         } else {
             if (mApiClient != null) {
                 if (mApiClient.isConnected()) {
-                    Fling.FlingApi.stopApplication(mApiClient);
+                    Flint.FlintApi.stopApplication(mApiClient);
                 }
                 disconnectApiClient();
             }
@@ -136,12 +134,11 @@ public class FlingDiceManager {
      * @param device
      */
     private void connectApiClient() {
-        Fling.FlingOptions apiOptions = Fling.FlingOptions.builder(
+        Flint.FlintOptions apiOptions = Flint.FlintOptions.builder(
                 mSelectedDevice, mFlingListener).build();
-        mApiClient = new FlingManager.Builder(mContext)
-                .addApi(Fling.API, apiOptions)
+        mApiClient = new FlintManager.Builder(mContext)
+                .addApi(Flint.API, apiOptions)
                 .addConnectionCallbacks(mConnectionCallbacks)
-                .addOnConnectionFailedListener(mConnectionFailedListener)
                 .build();
         mApiClient.connect();
     }
@@ -158,7 +155,7 @@ public class FlingDiceManager {
         }
     }
 
-    private class FlingListener extends Fling.Listener {
+    private class FlintListener extends Flint.Listener {
         @Override
         public void onApplicationDisconnected(int statusCode) {
             Log.d(TAG, "Fling.Listener.onApplicationDisconnected: "
@@ -166,8 +163,8 @@ public class FlingDiceManager {
             if (mApiClient != null) {
                 if (mApiClient.isConnected() || mApiClient.isConnecting()) {
                     try {
-                        Fling.FlingApi.stopApplication(mApiClient);
-                        Fling.FlingApi.removeMessageReceivedCallbacks(
+                        Flint.FlintApi.stopApplication(mApiClient);
+                        Flint.FlintApi.removeMessageReceivedCallbacks(
                                 mApiClient, mGameChannel.getNamespace());
                     } catch (IOException e) {
                         Log.e(TAG, "Exception while removing channel", e);
@@ -190,7 +187,7 @@ public class FlingDiceManager {
      * 
      */
     private class ConnectionCallbacks implements
-            FlingManager.ConnectionCallbacks {
+            FlintManager.ConnectionCallbacks {
         @Override
         public void onConnectionSuspended(int cause) {
             Log.d(TAG, "ConnectionCallbacks.onConnectionSuspended");
@@ -199,16 +196,13 @@ public class FlingDiceManager {
         @Override
         public void onConnected(Bundle connectionHint) {
             Log.d(TAG, "ConnectionCallbacks.onConnected");
-            Fling.FlingApi.launchApplication(mApiClient, getAppUrl())
+            Flint.FlintApi.launchApplication(mApiClient, getAppUrl())
                     .setResultCallback(new ConnectionResultCallback());
         }
-    }
 
-    private class ConnectionFailedListener implements
-            FlingManager.OnConnectionFailedListener {
         @Override
         public void onConnectionFailed(ConnectionResult result) {
-            Log.d(TAG, "ConnectionFailedListener.onConnectionFailed");
+            Log.d(TAG, "ConnectionCallbacks.onConnectionFailed");
             setSelectedDevice(null);
         }
     }
@@ -223,7 +217,7 @@ public class FlingDiceManager {
             if (status.isSuccess()) {
                 Log.d(TAG, "ConnectionResultCallback: " + appMetaData.getData());
                 try {
-                    Fling.FlingApi.setMessageReceivedCallbacks(mApiClient,
+                    Flint.FlintApi.setMessageReceivedCallbacks(mApiClient,
                             mGameChannel.getNamespace(), mGameChannel);
                 } catch (IOException e) {
                     Log.w(TAG, "Exception while launching application", e);
