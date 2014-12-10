@@ -11,10 +11,10 @@ h1 {
 #shadow {
     height:300px; width:600px; position:absolute; top:400px; left:0; z-index:0;
     background:-webkit-radial-gradient(center center , 150px 50px, #050505, #050505 );
-    background:-moz-radial-gradient(center center , 150px 50px, #cfcfcf, #efefef );
-    background:-ms-radial-gradient(center center , 150px 50px, #cfcfcf, #efefef );
-    background:-o-radial-gradient(center center , 150px 50px, #cfcfcf, #efefef );
-    background:radial-gradient(center center , 150px 50px, #cfcfcf, #efefef );
+    background:-moz-radial-gradient(center center , 150px 50px, #050505, #050505 );
+    background:-ms-radial-gradient(center center , 150px 50px, #050505, #050505 );
+    background:-o-radial-gradient(center center , 150px 50px, #050505, #050505 );
+    background:radial-gradient(center center , 150px 50px, #050505, #050505 );
     -moz-transform:perspective(100px) rotateX(60deg) rotateY(0deg);
     -ms-transform:perspective(100px) rotateX(60deg) rotateY(0deg);
     -o-transform:perspective(100px) rotateX(60deg) rotateY(0deg);
