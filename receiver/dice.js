@@ -133,10 +133,10 @@ Aui.ready(function () {
     /*********** fling app *************/
     var init_fling = function () {
         var self = this;
-        self.receiverWrapper = new ReceiverManagerWrapper("~dice");
+        self.receiverWrapper = new FlintReceiverManager("~dice");
         var messageBus = self.receiverWrapper.createMessageBus("urn:flint:org.openflint.fling.dice");
 
-        messageBus.on("message", function (senderId, data) {
+        messageBus.on("message", function (data, senderId) {
             console.log('********onMessage********' + data);
             var message = JSON.parse(data);
             console.log(' message command: ' + message.command);
